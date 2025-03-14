@@ -1,41 +1,64 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Node dependencies
 /node_modules
 /.pnp
 .pnp.*
+
+# Yarn & pnpm
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.pnpm-debug.log*
 
-# testing
-/coverage
-
-# next.js
+# Next.js build & output
 /.next/
 /out/
 
-# production
+# Production build
 /build
 
-# misc
-.DS_Store
-*.pem
+# Vercel deployment
+.vercel
 
-# debug
+# TailwindCSS JIT mode cache
+.tailwind/
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing & coverage
+/coverage
+/jest-cache
+/jest-test-results.json
+
+# Logs & debugging files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
+# Environment variables (avoid committing unless necessary)
 .env*
+!.env.example
 
-# vercel
-.vercel
+# macOS system files
+.DS_Store
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# SSL/TLS keys (avoid committing sensitive files)
+*.pem
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ShadCN UI (if using customized components)
+.shadcn/
+
+# Misc
+*.lock
