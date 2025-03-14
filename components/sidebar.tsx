@@ -18,12 +18,14 @@ import {
 } from "lucide-react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import { useAuth } from "@/contexts/auth-context"
 
 // Create a proper forwardRef component for the Dialog
 
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { logout } = useAuth()
   const [expandedSections, setExpandedSections] = useState({
     calendar: true,
     opportunities: true,
@@ -37,6 +39,11 @@ export default function Sidebar() {
       ...prev,
       [section]: !prev[section],
     }))
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
   }
 
   // Sample my calendars
@@ -97,7 +104,7 @@ export default function Sidebar() {
           <div>
             <div className="flex items-center gap-4 mb-6">
               <Menu className="h-6 w-6 text-white" />
-              <span className="text-2xl font-semibold text-white drop-shadow-lg">Lovy-tech</span>
+              <span className="text-2xl font-semibold text-white drop-shadow-lg">Applify</span>
             </div>
 
             <Link href="/dashboard">
@@ -264,7 +271,7 @@ export default function Sidebar() {
             </div>
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-auto flex flex-col gap-4">
             <button
                 className="flex items-center justify-center gap-2 rounded-full bg-blue-500 p-4 text-white w-14 h-14 self-start hover:bg-blue-600 transition-all"
                 onClick={() => setIsQuickAddOpen(true)}

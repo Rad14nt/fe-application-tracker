@@ -17,9 +17,13 @@ import {
   ArrowUp,
   ArrowDown,
   AlertTriangle,
+  Search,
 } from "lucide-react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+
+// Import the UserDropdown component
+import UserDropdown from "@/components/user-dropdown"
 
 export default function ArchivedOpportunitiesPage() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -200,14 +204,12 @@ export default function ArchivedOpportunitiesPage() {
 
           <div className="flex items-center gap-4">
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="relative z-10 p-8 pt-4">
+        <main className="relative z-10 p-8 pt-4 overflow-auto h-[calc(100vh-80px)]">
           {/* Back Button */}
           <div className="mb-6">
             <Link href="/opportunities">
@@ -216,6 +218,22 @@ export default function ArchivedOpportunitiesPage() {
                 <span>Back to Opportunities</span>
               </button>
             </Link>
+          </div>
+
+          {/* Search Input */}
+          <div className="mb-6">
+            <div className="relative">
+              <input
+                  type="text"
+                  placeholder="Search archived opportunities..."
+                  className="w-full bg-white/15 border border-white/20 rounded-lg py-2 px-4 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <Search className="h-5 w-5 text-white/50" />
+              </div>
+            </div>
           </div>
 
           {/* Archived Opportunities Table */}

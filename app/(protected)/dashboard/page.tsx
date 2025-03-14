@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { Calendar, Briefcase, Users, Clock, ChevronRight, Settings, Bell, FileText } from "lucide-react"
+import UserDropdown from "@/components/user-dropdown"
 
 // Update the dashboard layout to fill the entire page better
 export default function Dashboard() {
@@ -63,14 +64,12 @@ export default function Dashboard() {
             </span>
             </button>
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content - Updated Layout */}
-        <main className="relative z-10 p-8 pt-4 grid grid-cols-12 gap-6">
+        <main className="relative z-10 p-8 pt-4 grid grid-cols-12 gap-6 overflow-auto">
           {/* Upcoming Events - Spans 4 columns */}
           <div className="col-span-4 bg-white/20 backdrop-blur-lg rounded-xl border border-white/20 shadow-xl p-6 flex flex-col h-[calc(100vh-180px)]">
             <div className="flex items-center justify-between mb-4">

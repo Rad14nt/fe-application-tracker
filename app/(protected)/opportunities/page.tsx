@@ -28,6 +28,11 @@ import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import dynamic from "next/dynamic"
 
+// Import the UserDropdown component
+import UserDropdown from "@/components/user-dropdown"
+// Import the Pagination component
+import Pagination from "@/components/pagination"
+
 // Dynamically import the map component to avoid SSR issues
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -51,6 +56,9 @@ export default function OpportunitiesPage() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [opportunityToDelete, setOpportunityToDelete] = useState(null)
   const [menuOpenFiles, setMenuOpenFiles] = useState({})
+  // Add pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
 
   // Form state
   const [formData, setFormData] = useState({
@@ -361,7 +369,7 @@ export default function OpportunitiesPage() {
   }
 
   // Filter opportunities based on status and search query
-  const filteredOpportunities = opportunities
+  const filteredAndSortedOpportunities = opportunities
       .filter((opp) => {
         // Don't show rejected opportunities on the main page
         if (opp.status === "Rejected") return false
@@ -385,6 +393,12 @@ export default function OpportunitiesPage() {
         return 0
       })
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredAndSortedOpportunities.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const filteredOpportunities = filteredAndSortedOpportunities.slice(startIndex, endIndex)
+
   const toggleMenu = useCallback((id) => {
     setMenuOpenFiles((prevState) => ({
       ...prevState,
@@ -407,16 +421,28 @@ export default function OpportunitiesPage() {
         <header className="relative z-10 flex items-center justify-between px-8 py-6">
           <h1 className="text-2xl font-semibold text-white drop-shadow-lg">Opportunities</h1>
 
+          {/* Replace this in the header: */}
+          {/* <div className="flex items-center gap-4">
+          <Settings className="h-6 w-6 text-white drop-shadow-md" />
+          <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
+            U
+          </div>
+        </div> */}
+
+          {/* With this: */}
           <div className="flex items-center gap-4">
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="relative z-10 p-8 pt-4">
+        {/* Update the main content container to ensure proper scrolling: */}
+        {/* Replace: */}
+        {/* <main className="relative z-10 p-8 pt-4"> */}
+
+        {/* With: */}
+        <main className="relative z-10 p-8 pt-4 overflow-auto h-[calc(100vh-80px)]">
           {/* Controls */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
@@ -641,6 +667,9 @@ export default function OpportunitiesPage() {
               )}
               </tbody>
             </table>
+            {filteredAndSortedOpportunities.length > itemsPerPage && (
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            )}
           </div>
         </main>
 

@@ -18,6 +18,9 @@ import {
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 
+// Import the UserDropdown component
+import UserDropdown from "@/components/user-dropdown"
+
 export default function CalendarPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -416,14 +419,12 @@ export default function CalendarPage() {
 
           <div className="flex items-center gap-4">
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="relative z-10 pt-4 flex flex-col">
+        <main className="relative z-10 pt-4 flex flex-col overflow-hidden">
           {/* Calendar Controls */}
           <div className="flex items-center justify-between p-4 border-b border-white/20">
             <div className="flex items-center gap-4">

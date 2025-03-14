@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { Settings, X, Edit, Trash, Check, Eye, Clock, UserPlus } from "lucide-react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import UserDropdown from "@/components/user-dropdown"
 
 export default function CollaborationsPage() {
   const searchParams = useSearchParams()
@@ -142,14 +143,12 @@ export default function CollaborationsPage() {
 
           <div className="flex items-center gap-4">
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="relative z-10 p-8 pt-4">
+        <main className="relative z-10 p-8 pt-4 overflow-auto h-[calc(100vh-80px)]">
           {/* Controls */}
           <div className="flex justify-between items-center mb-6">
             <div>

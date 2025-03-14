@@ -18,6 +18,8 @@ import {
 } from "lucide-react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+// Import the UserDropdown component
+import UserDropdown from "@/components/user-dropdown"
 
 export default function FilesPage() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -195,16 +197,28 @@ export default function FilesPage() {
         <header className="relative z-10 flex items-center justify-between px-8 py-6">
           <h1 className="text-2xl font-semibold text-white drop-shadow-lg">Files</h1>
 
+          {/* Replace this in the header:
+        <div className="flex items-center gap-4">
+          <Settings className="h-6 w-6 text-white drop-shadow-md" />
+          <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
+            U
+          </div>
+        </div>
+
+        // With this: */}
           <div className="flex items-center gap-4">
             <Settings className="h-6 w-6 text-white drop-shadow-md" />
-            <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-md">
-              U
-            </div>
+            <UserDropdown />
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="relative z-10 p-8 pt-4 grid grid-cols-12 gap-6">
+        {/* Also, update the main content container to ensure proper scrolling:
+      // Replace:
+      <main className="relative z-10 p-8 pt-4 grid grid-cols-12 gap-6">
+
+      // With: */}
+        <main className="relative z-10 p-8 pt-4 grid grid-cols-12 gap-6 overflow-auto h-[calc(100vh-80px)]">
           {/* Left Sidebar - Categories */}
           <div className="col-span-3 bg-white/20 backdrop-blur-lg rounded-xl border border-white/20 shadow-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-6 drop-shadow-lg">Categories</h2>
