@@ -79,18 +79,78 @@ export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState("March 5")
   const [selectedEvent, setSelectedEvent] = useState(null)
 
-  // Month view helpers
+  // Date navigation state
+  const today = new Date()
+  const [viewDate, setViewDate] = useState(today)
+
+  // Get current year and month for the calendar
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth())
+  const [selectedDay, setSelectedDay] = useState(today.getDate())
+
+  // Navigate to today
+  const goToToday = () => {
+    const today = new Date()
+    setViewDate(today)
+    setSelectedYear(today.getFullYear())
+    setSelectedMonth(today.getMonth())
+    setSelectedDay(today.getDate())
+    setCurrentDate(`${today.toLocaleString("default", { month: "long" })} ${today.getDate()}`)
+    setCurrentMonth(`${today.toLocaleString("default", { month: "long" })} ${today.getFullYear()}`)
+  }
+
+  // Navigate previous/next based on current view
+  const navigatePrevious = () => {
+    const newDate = new Date(viewDate)
+    if (currentView === "day") {
+      newDate.setDate(newDate.getDate() - 1)
+    } else if (currentView === "week") {
+      newDate.setDate(newDate.getDate() - 7)
+    } else if (currentView === "month") {
+      newDate.setMonth(newDate.getMonth() - 1)
+    }
+    updateViewDate(newDate)
+  }
+
+  const navigateNext = () => {
+    const newDate = new Date(viewDate)
+    if (currentView === "day") {
+      newDate.setDate(newDate.getDate() + 1)
+    } else if (currentView === "week") {
+      newDate.setDate(newDate.getDate() + 7)
+    } else if (currentView === "month") {
+      newDate.setMonth(newDate.getMonth() + 1)
+    }
+    updateViewDate(newDate)
+  }
+
+  const updateViewDate = (date) => {
+    setViewDate(date)
+    setSelectedYear(date.getFullYear())
+    setSelectedMonth(date.getMonth())
+    setSelectedDay(date.getDate())
+    setCurrentDate(`${date.toLocaleString("default", { month: "long" })} ${date.getDate()}`)
+    setCurrentMonth(`${date.toLocaleString("default", { month: "long" })} ${date.getFullYear()}`)
+  }
+
+  // Helper functions for calendar rendering
   const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
   const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay()
 
-  // Get current year and month for the calendar
-  const currentYear = new Date().getFullYear()
-  const currentMonthIndex = new Date().getMonth()
-  const [selectedYear, setSelectedYear] = useState(currentYear)
-  const [selectedMonth, setSelectedMonth] = useState(currentMonthIndex)
+  // Get week dates for the week view
+  const getWeekDates = (date) => {
+    const day = date.getDay() // 0 = Sunday, 6 = Saturday
+    const diff = date.getDate() - day
+    const weekDates = []
+    for (let i = 0; i < 7; i++) {
+      const newDate = new Date(date)
+      newDate.setDate(diff + i)
+      weekDates.push(newDate.getDate())
+    }
+    return weekDates
+  }
 
-  // Day view state
-  const [selectedDayDate, setSelectedDayDate] = useState(new Date())
+  const weekDates = getWeekDates(viewDate)
 
   const handleEventClick = (event) => {
     setSelectedEvent(event)
@@ -315,11 +375,6 @@ export default function CalendarPage() {
     setEvents([...events, newCalendarEvent])
     setIsAddEventModalOpen(false)
 
-    // Update the view to show the day of the new event if in day view
-    if (currentView === "day") {
-      setSelectedDayDate(date)
-    }
-
     // Reset the form
     setNewEvent({
       title: "",
@@ -335,7 +390,6 @@ export default function CalendarPage() {
 
   // Sample calendar days for the week view
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
-  const weekDates = [3, 4, 5, 6, 7, 8, 9]
   const timeSlots = Array.from({ length: 9 }, (_, i) => i + 8) // 8 AM to 4 PM
 
   // Helper function to calculate event position and height
@@ -373,16 +427,18 @@ export default function CalendarPage() {
           {/* Calendar Controls */}
           <div className="flex items-center justify-between p-4 border-b border-white/20">
             <div className="flex items-center gap-4">
-              <button className="px-4 py-2 text-white bg-blue-500 rounded-md">Today</button>
+              <button className="px-4 py-2 text-white bg-blue-500 rounded-md" onClick={goToToday}>
+                Today
+              </button>
               <div className="flex">
-                <button className="p-2 text-white hover:bg-white/10 rounded-l-md">
+                <button className="p-2 text-white hover:bg-white/10 rounded-l-md" onClick={navigatePrevious}>
                   <ChevronLeft className="h-5 w-5" />
                 </button>
-                <button className="p-2 text-white hover:bg-white/10 rounded-r-md">
+                <button className="p-2 text-white hover:bg-white/10 rounded-r-md" onClick={navigateNext}>
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
-              <h2 className="text-xl font-semibold text-white">{currentDate}</h2>
+              <h2 className="text-xl font-semibold text-white">{currentView === "month" ? currentMonth : currentDate}</h2>
             </div>
 
             <div className="flex items-center gap-4">
@@ -428,7 +484,13 @@ export default function CalendarPage() {
                           <div key={i} className="p-2 text-center border-l border-white/20">
                             <div className="text-xs text-white/70 font-medium">{day}</div>
                             <div
-                                className={`text-lg font-medium mt-1 text-white ${weekDates[i] === 5 ? "bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center mx-auto" : ""}`}
+                                className={`text-lg font-medium mt-1 text-white ${
+                                    new Date().getDate() === weekDates[i] &&
+                                    new Date().getMonth() === viewDate.getMonth() &&
+                                    new Date().getFullYear() === viewDate.getFullYear()
+                                        ? "bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                                        : ""
+                                }`}
                             >
                               {weekDates[i]}
                             </div>
@@ -437,12 +499,15 @@ export default function CalendarPage() {
                     </div>
 
                     {/* Time Grid */}
-                    <div className="grid grid-cols-8">
+                    <div className="grid" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
                       {/* Time Labels */}
-                      <div className="text-white/70">
+                      <div className="text-white/70 text-right pr-2">
                         {timeSlots.map((time, i) => (
-                            <div key={i} className="h-20 border-b border-white/10 pr-2 text-right text-xs">
-                              {time > 12 ? `${time - 12} PM` : `${time} AM`}
+                            <div
+                                key={i}
+                                className="h-20 border-b border-white/10 pr-2 text-right text-xs flex items-center justify-end"
+                            >
+                              <span className="whitespace-nowrap">{time > 12 ? `${time - 12} PM` : `${time} AM`}</span>
                             </div>
                         ))}
                       </div>
@@ -484,42 +549,27 @@ export default function CalendarPage() {
               {currentView === "day" && (
                   <>
                     {/* Day Header */}
-                    <div className="grid grid-cols-2 border-b border-white/20">
-                      <div className="p-4 text-center text-white font-medium">
-                        {selectedDayDate.toLocaleDateString("en-US", {
+                    <div className="border-b border-white/20 p-4 text-center">
+                      <div className="text-white font-medium">
+                        {viewDate.toLocaleDateString("en-US", {
                           weekday: "long",
                           month: "long",
                           day: "numeric",
                           year: "numeric",
                         })}
                       </div>
-                      <div className="p-4 text-right text-white/70">
-                        <button
-                            className="px-2 py-1 bg-white/10 rounded-md text-white text-sm mr-2"
-                            onClick={() =>
-                                setSelectedDayDate(new Date(selectedDayDate.setDate(selectedDayDate.getDate() - 1)))
-                            }
-                        >
-                          Previous Day
-                        </button>
-                        <button
-                            className="px-2 py-1 bg-white/10 rounded-md text-white text-sm"
-                            onClick={() =>
-                                setSelectedDayDate(new Date(selectedDayDate.setDate(selectedDayDate.getDate() + 1)))
-                            }
-                        >
-                          Next Day
-                        </button>
-                      </div>
                     </div>
 
                     {/* Time Grid */}
-                    <div className="grid grid-cols-2">
+                    <div className="grid" style={{ gridTemplateColumns: "60px 1fr" }}>
                       {/* Time Labels */}
                       <div className="text-white/70">
                         {timeSlots.map((time, i) => (
-                            <div key={i} className="h-20 border-b border-white/10 pr-2 text-right text-xs">
-                              {time > 12 ? `${time - 12} PM` : `${time} AM`}
+                            <div
+                                key={i}
+                                className="h-20 border-b border-white/10 pr-2 text-right text-xs flex items-center justify-end"
+                            >
+                              <span className="whitespace-nowrap">{time > 12 ? `${time - 12} PM` : `${time} AM`}</span>
                             </div>
                         ))}
                       </div>
@@ -532,7 +582,7 @@ export default function CalendarPage() {
 
                         {/* Events */}
                         {events
-                            .filter((event) => event.day === selectedDayDate.getDay() + 1)
+                            .filter((event) => event.day === viewDate.getDay() + 1)
                             .map((event, i) => {
                               const eventStyle = calculateEventStyle(event.startTime, event.endTime)
                               return (
@@ -559,44 +609,6 @@ export default function CalendarPage() {
 
               {currentView === "month" && (
                   <>
-                    {/* Month Header */}
-                    <div className="grid grid-cols-2 border-b border-white/20">
-                      <div className="p-4 text-center text-white font-medium">
-                        {new Date(selectedYear, selectedMonth).toLocaleDateString("en-US", {
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </div>
-                      <div className="p-4 text-right text-white/70">
-                        <button
-                            className="px-2 py-1 bg-white/10 rounded-md text-white text-sm mr-2"
-                            onClick={() => {
-                              if (selectedMonth === 0) {
-                                setSelectedMonth(11)
-                                setSelectedYear(selectedYear - 1)
-                              } else {
-                                setSelectedMonth(selectedMonth - 1)
-                              }
-                            }}
-                        >
-                          Previous Month
-                        </button>
-                        <button
-                            className="px-2 py-1 bg-white/10 rounded-md text-white text-sm"
-                            onClick={() => {
-                              if (selectedMonth === 11) {
-                                setSelectedMonth(0)
-                                setSelectedYear(selectedYear + 1)
-                              } else {
-                                setSelectedMonth(selectedMonth + 1)
-                              }
-                            }}
-                        >
-                          Next Month
-                        </button>
-                      </div>
-                    </div>
-
                     {/* Month Grid */}
                     <div className="grid grid-cols-7 text-center">
                       {/* Day Names */}
@@ -614,7 +626,7 @@ export default function CalendarPage() {
 
                         // Empty cells for days before the first day of the month
                         for (let i = 0; i < firstDay; i++) {
-                          days.push(<div key={`empty-${i}`} className="p-2 h-24 border border-white/10"></div>)
+                          days.push(<div key={`empty-${i}`} className="p-2 min-h-[120px] border border-white/10"></div>)
                         }
 
                         // Days of the month
@@ -625,25 +637,31 @@ export default function CalendarPage() {
                           const dayEvents = events.filter((event) => event.day === dayOfWeek)
 
                           days.push(
-                              <div key={day} className="p-2 h-24 border border-white/10 relative">
+                              <div key={day} className="p-2 min-h-[120px] border border-white/10 relative overflow-y-auto">
                                 <div
-                                    className={`text-sm font-medium ${new Date().getDate() === day && new Date().getMonth() === selectedMonth && new Date().getFullYear() === selectedYear ? "bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mx-auto" : "text-white"}`}
+                                    className={`text-sm font-medium mb-2 ${
+                                        new Date().getDate() === day &&
+                                        new Date().getMonth() === selectedMonth &&
+                                        new Date().getFullYear() === selectedYear
+                                            ? "bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mx-auto"
+                                            : "text-white"
+                                    }`}
                                 >
                                   {day}
                                 </div>
-                                <div className="mt-1 overflow-hidden max-h-16">
-                                  {dayEvents.slice(0, 2).map((event, i) => (
+                                <div className="space-y-1">
+                                  {dayEvents.map((event, i) => (
                                       <div
                                           key={i}
-                                          className={`${event.color} rounded-sm p-1 text-white text-xs mb-1 truncate cursor-pointer`}
+                                          className={`${event.color} rounded-sm p-1 text-white text-xs truncate cursor-pointer hover:opacity-90`}
                                           onClick={() => handleEventClick(event)}
                                       >
-                                        {event.title}
+                                        <div className="flex items-center">
+                                          <span className="w-1/4 text-[8px]">{event.startTime}</span>
+                                          <span className="w-3/4 truncate">{event.title}</span>
+                                        </div>
                                       </div>
                                   ))}
-                                  {dayEvents.length > 2 && (
-                                      <div className="text-white/70 text-xs text-center">+{dayEvents.length - 2} more</div>
-                                  )}
                                 </div>
                               </div>,
                           )
